@@ -9,8 +9,6 @@ Vue.config.productionTip = false;
 Vue.use(Antd);
 
 new Vue({
-  router,
-  store,
   render: function (h) {
     return h(App);
   },
