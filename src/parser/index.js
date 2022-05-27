@@ -28,8 +28,6 @@ export const parse = (input) => {
     const dataGenerater = new DataGenerater();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(dataGenerater, tree);
 
-
-    console.log(SearchContext.getSuggestions())
     if (SearchContext.getError()) {
         return SearchContext.getError()
     }

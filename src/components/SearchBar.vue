@@ -9,9 +9,12 @@
       <a-col :span="20">
         <codemirror
           id="CodeMirror"
+          ref="CodeMirror"
           :options="options"
+          :events="events"
           placeholder="Basic usage"
           @ready="onEditorReady"
+          @cursorActivity="onChange"
           v-model="query"
         />
       </a-col>
@@ -28,7 +31,10 @@
 import OutputTable from "./OutputTable.vue";
 import { codemirror } from "vue-codemirror";
 import "codemirror/lib/codemirror.css";
+import "codemirror/addon/hint/show-hint";
+import "codemirror/addon/hint/show-hint.css";
 import "codemirror/theme/dracula.css";
+import SearchContext from "@/parser/searchContext";
 
 export default {
   name: "SearchBar",
@@ -37,9 +43,9 @@ export default {
     codemirror,
   },
   data() {
+    this.events = ["cursorActivity"];
     return {
-      query:
-        'show top 10 sourceip:"192.168.0.1" metric:"system.network.interface~in.bytes.per.sec"',
+      query: "",
       options: {
         theme: "dracula",
       },
@@ -47,6 +53,7 @@ export default {
   },
   methods: {
     onEditorReady(editor) {
+      console.log(this.$refs.CodeMirror.codemirror);
       editor.focus();
       editor.on("beforeChange", this.cleanNewLines);
     },
@@ -54,6 +61,39 @@ export default {
       var newtext = change.text.join("").replace(/\n/g, ""); // remove ALL \n !
       change.update(change.from, change.to, [newtext]);
       return true;
+    },
+    onChange(editor) {
+      var queryInfo = {
+        query: editor.getValue(),
+        caretPosition: editor.getCursor().ch,
+      };
+      this.showSuggestions();
+    },
+    showSuggestions() {
+      var suggestionList = SearchContext.getSuggestions();
+      var range = SearchContext.getRange();
+
+      if (suggestionList) {
+        suggestionList = suggestionList.map((o) => ({
+          displayText: o,
+          text: o,
+        }));
+        var options = {};
+        options.hint = () => ({
+          from: { line: 0, ch: range.start },
+          to: { line: 0, ch: range.end + 1 },
+          list: suggestionList,
+        });
+        this.$refs.CodeMirror.codemirror.showHint(options);
+      } else {
+        var options = {};
+        options.hint = () => ({
+          from: { line: 0, ch: range.start },
+          to: { line: 0, ch: range.end + 1 },
+          list: [],
+        });
+        this.$refs.CodeMirror.codemirror.showHint(options);
+      }
     },
   },
 };

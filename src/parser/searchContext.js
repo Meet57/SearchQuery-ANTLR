@@ -2,6 +2,7 @@ class searchContext {
   _data = null;
   _error = null;
   _suggestions = null;
+  _range = null;
 
   getData() {
     return this._data;
@@ -25,6 +26,14 @@ class searchContext {
 
   setSuggestions(data) {
     this._suggestions = data;
+  }
+
+  getRange() {
+    return this._range;
+  }
+
+  setRange(data) {
+    this._range = data;
   }
 }
 

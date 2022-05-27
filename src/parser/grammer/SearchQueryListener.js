@@ -26,7 +26,7 @@ export default class SearchQueryListener extends antlr4.tree.ParseTreeListener {
 
 	// Enter a parse tree produced by SearchQueryParser#command.
 	enterCommand(ctx) {
-		// console.log(ctx.getText(), SearchQueryListener.getRange(ctx));
+		SearchContext.setRange(SearchQueryListener.getRange(ctx))
 		if (ctx.getChildCount() == 0) {
 			SearchContext.setSuggestions(["get ", "show "]);
 		}
@@ -39,7 +39,7 @@ export default class SearchQueryListener extends antlr4.tree.ParseTreeListener {
 
 	// Enter a parse tree produced by SearchQueryParser#topnsorting.
 	enterTopnsorting(ctx) {
-		// console.log(ctx.getText(), SearchQueryListener.getRange(ctx));
+		SearchContext.setRange(SearchQueryListener.getRange(ctx))
 		if (ctx.getChildCount() == 0) {
 			SearchContext.setSuggestions(["top 10", "last 10", "least 10"]);
 		}
@@ -52,12 +52,12 @@ export default class SearchQueryListener extends antlr4.tree.ParseTreeListener {
 
 	// Enter a parse tree produced by SearchQueryParser#source.
 	enterSource(ctx) {
-		// console.log(ctx.getText(), SearchQueryListener.getRange(ctx));
 		// console.log(
 		// 	document
 		// 		.getElementById("rawText")
 		// 		.value.slice(SearchQueryListener.getRange(ctx).start, SearchQueryListener.getRange(ctx).end)
 		// );
+		SearchContext.setRange(SearchQueryListener.getRange(ctx))
 		if (ctx.getChildCount() == 0) {
 			SearchContext.setSuggestions([
 				`source:'ubuntu.oracle.local' `,
@@ -73,6 +73,7 @@ export default class SearchQueryListener extends antlr4.tree.ParseTreeListener {
 
 	// Enter a parse tree produced by SearchQueryParser#counter.
 	enterCounter(ctx) {
+		SearchContext.setRange(SearchQueryListener.getRange(ctx))
 		if (ctx.getChildCount() == 0) {
 			SearchContext.setSuggestions([
 				`metric:'system.network.interface~in.bytes.per.sec'`,
