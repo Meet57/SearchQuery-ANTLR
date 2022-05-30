@@ -12,7 +12,6 @@
           ref="CodeMirror"
           :options="options"
           :events="events"
-          placeholder="Basic usage"
           @ready="onEditorReady"
           @cursorActivity="onChange"
           v-model="query"
@@ -53,7 +52,6 @@ export default {
   },
   methods: {
     onEditorReady(editor) {
-      console.log(this.$refs.CodeMirror.codemirror);
       editor.focus();
       editor.on("beforeChange", this.cleanNewLines);
     },
@@ -67,12 +65,13 @@ export default {
         query: editor.getValue(),
         caretPosition: editor.getCursor().ch,
       };
-      this.showSuggestions();
+      this.showSuggestions(queryInfo);
     },
-    showSuggestions() {
+
+    showSuggestions({ caretPosition }) {
       var suggestionList = SearchContext.getSuggestions();
       var range = SearchContext.getRange();
-
+      console.log(range, caretPosition);
       if (suggestionList) {
         suggestionList = suggestionList.map((o) => ({
           displayText: o,
@@ -81,7 +80,7 @@ export default {
         var options = {};
         options.hint = () => ({
           from: { line: 0, ch: range.start },
-          to: { line: 0, ch: range.end + 1 },
+          to: { line: 0, ch: caretPosition },
           list: suggestionList,
         });
         this.$refs.CodeMirror.codemirror.showHint(options);
@@ -89,7 +88,7 @@ export default {
         var options = {};
         options.hint = () => ({
           from: { line: 0, ch: range.start },
-          to: { line: 0, ch: range.end + 1 },
+          to: { line: 0, ch: caretPosition },
           list: [],
         });
         this.$refs.CodeMirror.codemirror.showHint(options);
